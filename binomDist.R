@@ -21,7 +21,9 @@ binom10000 <- data.frame(Successes = rbinom(n=10000, size=10000, prob=0.2), Size
 binomAll <- rbind(binom5, binom10, binom100, binom10000)
 
 p2 <- ggplot(binomAll, aes(x=Successes)) + geom_histogram() + 
-    facet_wrap(~ Size, scales="free")
+    facet_wrap(~ Size, scales="free") + 
+    ggtitle(expression("Binomial Distribution" == 
+                           paste(bgroup("(",atop(n,x),")"), p^x,(1-p)^(n-x))))
 
 #prob exactly 3 success out of 10
 dbinom(x=3, size=10, prob=0.3)
