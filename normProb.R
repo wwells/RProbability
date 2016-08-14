@@ -11,7 +11,14 @@ p <- ggplot(data.frame(x=randNorm, y=randDensity)) + aes(x=x,y=y) +
     geom_line() + labs(x="x", y="Density") + 
     ggtitle(expression("Normal Distribution" == paste(frac(1, sqrt(2 * pi * sigma^2)),
                                      " ", e^{frac(-(x - mu)^2, 2 * sigma^2)})))
-            
+
+# dif way to visualize plot:
+plot(density(randNorm))
+
+# using ggplot using geom_density() to find the density automagically
+g <- ggplot(data.frame(randNorm), aes(randNorm)) + geom_density() + 
+    ggtitle("Using geom_density() in ggplot")
+
 #generate values for -1 to shade
 neg1Seq <- seq(from=min(randNorm), to=-1, by=.1)
 
