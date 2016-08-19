@@ -31,3 +31,18 @@ dbinom(x=3, size=10, prob=0.3)
 pbinom(q=3, size=10, prob=0.3)
 #more than 3
 pbinom(q=3, size=10, prob=0.3, lower.tail=FALSE)
+
+### Use full formula, contrast w/ Rfunctions
+n <- 10
+p <- .3
+x <- 3
+choose(n, x) * p^x * (1-p)^(n-x)
+#or
+dbinom(x, n, p)
+
+#CDF
+a <- 5
+i <- 0:a
+sum(choose(n, i) * p^i * (1-p)^(n-i))
+#or
+pbinom(a, n, p)
