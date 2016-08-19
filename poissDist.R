@@ -6,15 +6,30 @@
 
 # from R For Everyone
 library(ggplot2)
-
-pmf <- function(x, lambda) {
-    ((lambda^x)*exp(1)^(-lambda))/factorial(x)
-}
-
-#same as "dpois"
-
+library(reshape2)
+library(stringr)
 # in poisson, lambda is both mean and variance
 
+pois1 <- rpois(n=10000, lambda=1)
+pois2 <- rpois(n=10000, lambda=2)
+pois5 <- rpois(n=10000, lambda=5)
+pois10 <- rpois(n=10000, lambda=10)
+pois20 <- rpois(n=10000, lambda=20)
+pois40 <- rpois(n=10000, lambda=40)
+pois <- data.frame(Lambda.1=pois1, Lambda.2=pois2,
+                   Lambda.5=pois5, Lambda.10=pois10,
+                   Lambda.20=pois20, Lambda.40=pois40)
 
-p <- ggplot() + ggtitle(expression("Normal Distribution" == paste(frac(1, sqrt(2 * pi * sigma^2)),
-                                                          " ", e^{frac(-(x - mu)^2, 2 * sigma^2)})))
+pois <- melt(data=pois, variable.name = "Lambda", value.name="x")
+pois$Lambda <- as.factor(as.numeric(str_extract(string=pois$Lambda, 
+                                                pattern="\\d+")))
+## plot
+p <- ggplot(pois, aes(x=x)) + geom_histogram(binwidth=1) + 
+    facet_wrap(~Lambda) + 
+    ggtitle(expression("Poisson Distribution" == frac(paste(lambda^x, e^-lambda), factorial(x))))
+
+## nicer plot
+p2 <- ggplot(pois, aes(x=x)) + 
+    geom_density(aes(group=Lambda, color=Lambda, fill=Lambda), adjust=4, alpha=1/2) +
+    scale_color_discrete() + scale_fill_discrete() + 
+    ggtitle(expression("Poisson Distribution" == frac(paste(lambda^x, e^-lambda), factorial(x))))

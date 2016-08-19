@@ -1,4 +1,4 @@
-#generate normal dist graphs in R
+#generate standard normal dist graphs in R
 
 # from R For Everyone
 library(ggplot2)
