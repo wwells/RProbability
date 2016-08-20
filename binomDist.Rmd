@@ -1,3 +1,14 @@
+---
+title: "binomDist.R"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
 #generate binom dist graphs in R
 #In probability theory and statistics, 
 #the binomial distribution with parameters n and p 
@@ -11,6 +22,7 @@ library(ggplot2)
 #vis 10k experiments w/ 10 trials and 0.3 prob success
 binomData <- data.frame(Successes = rbinom(n=10000, size=10, prob=0.3))
 p <- ggplot(binomData, aes(x=Successes)) + geom_histogram(binwidth=1)
+p
 
 #as n grows, close to normdist
 binom5 <- data.frame(Successes=rbinom(n=10000, size=5, prob=.2), Size=5)
@@ -24,6 +36,7 @@ p2 <- ggplot(binomAll, aes(x=Successes)) + geom_histogram() +
     facet_wrap(~ Size, scales="free") + 
     ggtitle(expression("Binomial Distribution" == 
                            paste(bgroup("(",atop(n,x),")"), p^x,(1-p)^(n-x))))
+p2
 
 #prob exactly 3 success out of 10
 dbinom(x=3, size=10, prob=0.3)
@@ -46,3 +59,6 @@ i <- 0:a
 sum(choose(n, i) * p^i * (1-p)^(n-i))
 #or
 pbinom(a, n, p)
+
+```
+

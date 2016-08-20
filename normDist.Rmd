@@ -1,5 +1,5 @@
 ---
-title: "normProb.R"
+title: "normDist.R"
 output: html_document
 ---
 

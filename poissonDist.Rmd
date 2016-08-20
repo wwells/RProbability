@@ -1,3 +1,14 @@
+---
+title: "poissonDist.R"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
 #generate poisson dist graphs in R
 #In probability theory and statistics, 
 #the poisson dist is also for count data, and relies on 
@@ -27,9 +38,14 @@ pois$Lambda <- as.factor(as.numeric(str_extract(string=pois$Lambda,
 p <- ggplot(pois, aes(x=x)) + geom_histogram(binwidth=1) + 
     facet_wrap(~Lambda) + 
     ggtitle(expression("Poisson Distribution" == frac(paste(lambda^x, e^-lambda), factorial(x))))
+p
 
 ## nicer plot
 p2 <- ggplot(pois, aes(x=x)) + 
     geom_density(aes(group=Lambda, color=Lambda, fill=Lambda), adjust=4, alpha=1/2) +
     scale_color_discrete() + scale_fill_discrete() + 
     ggtitle(expression("Poisson Distribution" == frac(paste(lambda^x, e^-lambda), factorial(x))))
+p2
+
+```
+
