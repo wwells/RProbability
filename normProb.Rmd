@@ -1,8 +1,16 @@
-#generate standard normal dist graphs in R
+---
+title: "normProb.R"
+output: html_document
+---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
 # from R For Everyone
 library(ggplot2)
-
 
 randNorm <- rnorm(30000)
 randDensity <- dnorm(randNorm)
@@ -11,6 +19,7 @@ p <- ggplot(data.frame(x=randNorm, y=randDensity)) + aes(x=x,y=y) +
     geom_line() + labs(x="x", y="Density") + 
     ggtitle(expression("Normal Distribution" == paste(frac(1, sqrt(2 * pi * sigma^2)),
                                      " ", e^{frac(-(x - mu)^2, 2 * sigma^2)})))
+p
 
 # dif way to visualize plot:
 plot(density(randNorm))
@@ -18,6 +27,7 @@ plot(density(randNorm))
 # using ggplot using geom_density() to find the density automagically
 g <- ggplot(data.frame(randNorm), aes(randNorm)) + geom_density() + 
     ggtitle("Using geom_density() in ggplot")
+g
 
 #generate values for -1 to shade
 neg1Seq <- seq(from=min(randNorm), to=-1, by=.1)
@@ -31,7 +41,9 @@ lessthanNeg1 <- rbind(c(min(randNorm), 0),
                       c(max(lessthanNeg1$x), 0))
 
 #plot
-p + geom_polygon(data=lessthanNeg1, aes(x=x, y=y))
+p + geom_polygon(data=lessthanNeg1, aes(x=x, y=y)) +
+        ggtitle(expression(phi(x) == paste(frac(1, sqrt(2 * pi)),
+                                       " ", integral(e^(-t^2/2) * dt, -infinity, x))))
 
 # seq from -1 to 1
 neg1to1Seq <- seq(-1,1,.1)
@@ -40,11 +52,38 @@ neg1to1 <- rbind(c(min(neg1to1$x), 0),
                  neg1to1,
                  c(max(neg1to1$x), 0))
 
-p + geom_polygon(data=neg1to1, aes(x=x, y=y))
+p + geom_polygon(data=neg1to1, aes(x=x, y=y)) + 
+        ggtitle(expression(phi(x) == paste(frac(1, sqrt(2 * pi)),
+                                       " ", integral(e^(-t^2/2) * dt, -infinity, x))))
 
-#cdf
+### let's do manually
+x <- -1
+sigma <- 2
+mu <- 1
+
+#manually
+norm <- function(x, mu, sigma){
+    1/sqrt(2*pi*sigma^2)*exp(1)^(-(x-mu)^2/(2*sigma^2))
+    }
+norm(x, mu, sigma)
+
+# rfunction
+dnorm(x, mu, sigma)
+
+#cdf of standard normal distribution
 randProb <- pnorm(randNorm)
 cdf <- ggplot(data.frame(x=randNorm, y=randProb)) + aes(x=x, y=y) + 
     geom_point() + labs(x="Random Normal Variables", y="Probability") + 
     ggtitle(expression(phi(x) == paste(frac(1, sqrt(2 * pi)),
                                        " ", integral(e^(-t^2/2) * dt, -infinity, x))))
+cdf
+
+### let's do manually
+
+#manually
+f <- function(a) {integrate(norm(a,mu,sigma), -Inf, x, a)$value}
+# rfunction
+pnorm(x, mu, sigma)
+
+```
+
