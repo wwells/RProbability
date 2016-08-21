@@ -8,7 +8,26 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-```{r}
+### Poisson Distribution
+
+<i> from Wikipedia </i> 
+
+In probability theory and statistics, the Poisson distribution, named after French mathematician Siméon Denis Poisson, is a discrete probability distribution that expresses the probability of a given number of events occurring in a fixed interval of time and/or space if these events occur with a known average rate and independently of the time since the last event. The Poisson distribution can also be used for the number of events in other specified intervals such as distance, area or volume.
+
+For instance, an individual keeping track of the amount of mail they receive each day may notice that they receive an average number of 4 letters per day. If receiving any particular piece of mail doesn't affect the arrival times of future pieces of mail, i.e., if pieces of mail from a wide range of sources arrive independently of one another, then a reasonable assumption is that the number of pieces of mail received per day obeys a Poisson distribution. Other examples that may follow a Poisson: the number of phone calls received by a call center per hour, the number of decay events per second from a radioactive source, or the number of pedicabs in queue in a particular street in a given hour of a day
+
+#### Assumptions: When is the Poisson distribution an appropriate model?
+
+The Poisson distribution is an appropriate model if the following assumptions are true.
+
+*  K is the number of times an event occurs in an interval and K can take values 0, 1, 2, …
+*  The occurrence of one event does not affect the probability that a second event will occur. That is, events occur independently.
+*  The rate at which events occur is constant. The rate cannot be higher in some intervals and lower in other intervals.
+*  Two events cannot occur at exactly the same instant.
+*  The probability of an event in an interval is proportional to the length of the interval.
+
+If these conditions are true, then K is a Poisson random variable, and the distribution of K is a Poisson distribution.
+```{r, warning=FALSE}
 #generate poisson dist graphs in R
 #In probability theory and statistics, 
 #the poisson dist is also for count data, and relies on 
@@ -19,17 +38,16 @@ knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
 library(reshape2)
 library(stringr)
-# in poisson, lambda is both mean and variance
 
+# in poisson, lambda is both mean and variance
 pois1 <- rpois(n=10000, lambda=1)
 pois2 <- rpois(n=10000, lambda=2)
 pois5 <- rpois(n=10000, lambda=5)
 pois10 <- rpois(n=10000, lambda=10)
 pois20 <- rpois(n=10000, lambda=20)
-pois40 <- rpois(n=10000, lambda=40)
 pois <- data.frame(Lambda.1=pois1, Lambda.2=pois2,
                    Lambda.5=pois5, Lambda.10=pois10,
-                   Lambda.20=pois20, Lambda.40=pois40)
+                   Lambda.20=pois20)
 
 pois <- melt(data=pois, variable.name = "Lambda", value.name="x")
 pois$Lambda <- as.factor(as.numeric(str_extract(string=pois$Lambda, 
@@ -37,15 +55,36 @@ pois$Lambda <- as.factor(as.numeric(str_extract(string=pois$Lambda,
 ## plot
 p <- ggplot(pois, aes(x=x)) + geom_histogram(binwidth=1) + 
     facet_wrap(~Lambda) + 
-    ggtitle(expression("Poisson Distribution" == frac(paste(lambda^x, e^-lambda), factorial(x))))
+    ggtitle(expression("Poisson Distribution" == frac(paste(lambda^x, e^-lambda), paste(x, '!'))))
 p
 
 ## nicer plot
 p2 <- ggplot(pois, aes(x=x)) + 
     geom_density(aes(group=Lambda, color=Lambda, fill=Lambda), adjust=4, alpha=1/2) +
     scale_color_discrete() + scale_fill_discrete() + 
-    ggtitle(expression("Poisson Distribution" == frac(paste(lambda^x, e^-lambda), factorial(x))))
+    ggtitle(expression("Poisson Distribution" == frac(paste(lambda^x, e^-lambda), paste(x, '!'))))
+
 p2
 
 ```
 
+
+#### Let's make our own functions and compare to R functions
+
+```{r}
+#Ugarte and colleagues report that the average number of goals in a World Cup soccer match is approximately 2.5 and the Poisson model is appropriate.   let's see probability of finding 0, 1, 2, 3 goals per match
+lambda <- 2.5
+poissondist <- function(x, lambda) {
+    (exp(1) ^ (-lambda) * lambda ^ x) / factorial(x)
+}
+poissondist(0:3, lambda)
+dpois(0:3, lambda)
+
+#For example, consider a Quality Assurance department that performs random tests of individual hard disks. Their policy is to shut down the manufacturing process if an inspector finds more than four bad sectors on a disk. What is the probability of shutting down the process if the mean number of bad sectors (λ) is two?
+lambda <- 2
+poissoncdf <- function(x, lambda) {
+    sum((exp(1) ^ (-lambda) * lambda ^ x) / factorial(x))
+}
+1 - poissoncdf(0:4,lambda)
+ppois(4, lambda, lower.tail = FALSE)
+```
