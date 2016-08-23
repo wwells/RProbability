@@ -1,0 +1,83 @@
+---
+title: "logisticDist.Rmd"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### Logistic Distribution
+
+<i> from Wikipedia </i> 
+
+In probability theory and statistics, the logistic distribution is a continuous probability distribution. Its cumulative distribution function is the logistic function, which appears in logistic regression and feedforward neural networks. It resembles the normal distribution in shape but has heavier tails (higher kurtosis). The Tukey lambda distribution can be considered a generalization of the logistic distribution since it adds a shape parameter, λ, and corresponds to the logistic distribution when λ is zero.
+
+#### Logistic regression
+
+One of the most common applications is in logistic regression, which is used for modeling categorical dependent variables (e.g., yes-no choices or a choice of 3 or 4 possibilities), much as standard linear regression is used for modeling continuous variables (e.g., income or population). Specifically, logistic regression models can be phrased as latent variable models with error variables following a logistic distribution. This phrasing is common in the theory of discrete choice models, where the logistic distribution plays the same role in logistic regression as the normal distribution does in probit regression. Indeed, the logistic and normal distributions have a quite similar shape. However, the logistic distribution has heavier tails, which often increases the robustness of analyses based on it compared with using the normal distribution.
+
+```{r, warning=FALSE}
+#generate logistic dist graphs in R
+#In probability theory and statistics, 
+#the logistic dist is also for count data, and relies on mu for mean and s for scale
+
+# cribbed from R For Everyone
+library(ggplot2)
+library(reshape2)
+library(stringr)
+
+#mu = mean of the distribution, s=scale
+mu <- 0
+
+logi1 <- rlogis(n=10000, mu, 1)
+logi2 <- rlogis(n=10000, mu, 2)
+logi3 <- rlogis(n=10000, mu, 3)
+logi4 <- rlogis(n=10000, mu, 4)
+logi5 <- rlogis(n=10000, mu, 5)
+logi <- data.frame(Scale.1=logi1, Scale.2=logi2,
+                   Scale.3=logi3, Scale.4=logi4,
+                   Scale.5=logi5)
+
+logi <- melt(data=logi, variable.name = "Scale", value.name="x")
+logi$Scale <- as.factor(as.numeric(str_extract(string=logi$Scale, 
+                                                pattern="\\d+")))
+
+## plot
+p <- ggplot(logi, aes(x=x)) + 
+    geom_density(aes(group=Scale, color=Scale, fill=Scale), alpha=1/2) +
+    scale_color_discrete() + scale_fill_discrete() + 
+    ggtitle(expression("Logistic Distribution" == frac(e^frac(x-mu, s), 
+                                                       paste(s, (1 + e ^ frac(x-mu, s))^2))
+                       ))
+
+p
+
+### CDF 
+cdf <- ggplot(logi, aes(x=x)) + stat_ecdf(aes(color=Scale)) + labs(x="Random Normal Variables", y="Probability") + 
+    ggtitle(expression("Logistic CDF" == frac(1, 1 + e ^ -frac(x-mu, s))
+                       ))
+
+cdf
+
+```
+
+#### Let's make our own functions and compare to R functions
+
+```{r}
+mu <- 2
+s <- 4
+logisticdist <- function(x, mu, s) {
+    (exp(1) ^ ((x-mu) / s)) /  (s * (1 + exp(1)^((x-mu)/s))^2)
+}
+logisticdist(0:3, mu, s)
+dlogis(0:3, mu, s)
+
+
+logisticcdf <- function(x, mu, s) {
+    1/(1+exp(1)^-((x-mu)/s))
+}
+1 - logisticcdf(4,mu, s)
+plogis(4, mu, s, lower.tail = FALSE)
+```
