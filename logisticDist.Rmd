@@ -33,12 +33,10 @@ mu <- 0
 
 logi1 <- rlogis(n=10000, mu, 1)
 logi2 <- rlogis(n=10000, mu, 2)
-logi3 <- rlogis(n=10000, mu, 3)
-logi4 <- rlogis(n=10000, mu, 4)
 logi5 <- rlogis(n=10000, mu, 5)
+logi10 <- rlogis(n=10000, mu, 10)
 logi <- data.frame(Scale.1=logi1, Scale.2=logi2,
-                   Scale.3=logi3, Scale.4=logi4,
-                   Scale.5=logi5)
+                   Scale.5=logi5, Scale.10=logi10)
 
 logi <- melt(data=logi, variable.name = "Scale", value.name="x")
 logi$Scale <- as.factor(as.numeric(str_extract(string=logi$Scale, 
@@ -55,7 +53,9 @@ p <- ggplot(logi, aes(x=x)) +
 p
 
 ### CDF 
-cdf <- ggplot(logi, aes(x=x)) + stat_ecdf(aes(color=Scale)) + labs(x="Random Normal Variables", y="Probability") + 
+logi$y <- plogis(logi$x, scale =as.numeric(logi$Scale))
+cdf <- ggplot(logi, aes(x=x, y=y)) + 
+    geom_line(aes(group=Scale, color=Scale)) + labs(x="Random Normal Variables", y="Probability") + 
     ggtitle(expression("Logistic CDF" == frac(1, 1 + e ^ -frac(x-mu, s))
                        ))
 
